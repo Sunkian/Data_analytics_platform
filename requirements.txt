@@ -1,0 +1,6 @@
+streamlit
+transformers
+Flask
+flask_sqlalchemy
+pymysql
+protobuf==3.20.*
