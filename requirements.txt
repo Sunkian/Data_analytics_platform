@@ -4,3 +4,10 @@ Flask
 flask_sqlalchemy
 pymysql
 protobuf==3.20.*
+requests
+flask
+pandas
+numpy
+torch
+mysql-connector
+mysql-connector-python
