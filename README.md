@@ -21,7 +21,15 @@ python3.11 -m pip install --upgrade pip
 pip3 install -r requirements.txt
 ```
 
-4. Run the Streamlit app
+4. Make sure your database is active
+
+5. Run the Flask API
+```sh
+run flask_api.py
+```
+
+6. Run the Streamlit app
 ```sh
 streamlit run streamlit_platform.py
 ```
+
