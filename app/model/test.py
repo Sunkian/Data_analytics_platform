@@ -1,0 +1,1 @@
+What is the total number of customers in the Chocolate Haven branch?
