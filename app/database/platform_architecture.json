@@ -1,0 +1,15 @@
+{
+    "platform": {
+        "orders": {
+            "orderID": "INTEGER",
+            "userName": "VARCHAR(50)",
+            "orderType": "VARCHAR(255)",
+            "purchaseDate": "DATE"
+        },
+        "products": {
+            "productID": "INTEGER",
+            "productType": "VARCHAR(50)",
+            "operatingSystem": "VARCHAR(50)"
+        }
+    }
+}
