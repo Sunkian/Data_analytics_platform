@@ -16,5 +16,14 @@ def receive_message():
     # Return a success message with the received message
     return jsonify({"status": "success", "received_message": message}), 200
 
+@app.route('/receive-sql', methods=['POST'])
+def receive_sql():
+    data = request.get_json()
+    sql_code = data.get('sql_code', '')
+    print("Received SQL code:", sql_code)
+    # Do something with the SQL code, like executing it or storing it
+    return jsonify({"status": "success", "message": "SQL code received"}), 200
+
+
 if __name__ == '__main__':
     app.run(debug=True)

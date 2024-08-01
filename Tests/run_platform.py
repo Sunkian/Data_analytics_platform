@@ -2,6 +2,7 @@
 import streamlit as st
 import pandas as pd
 from connection_database import connect_to_mysql, execute_sql_query, get_database_architecture
+from run_Llama3 import generate_sql
 import json
 # Main Streamlit App
 st.title('Database Analytics Platform')
@@ -40,7 +41,7 @@ if engine:
                 st.error(f"Error saving JSON file: {e}")
 
 
-
+    # === Select the database type as well as the query ===
     st.markdown('''
     :blue[Then, choose your database type and specify the query you wish to ask the model to translate]
     ''')
@@ -62,12 +63,12 @@ if engine:
     
 
     st.markdown('''
-    :blue[If you are okay with the translation, search the database !]
+    :blue[RESULT OF THE QUERY SHOULD BE HERE]
     ''')
 
 
     st.markdown('''
-    :blue[Test : write an SQL query to send the database]
+    :orange[Test : write an SQL query to send the database]
     ''')
     # Input for the SQL query
     sql_query = st.text_area("Enter your SQL query:")

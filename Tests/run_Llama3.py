@@ -1,21 +1,84 @@
-import random
 from TextGenerationInference import TGI, GenerateRequest, GenerateParameters
-import json 
-import re
-import time 
-from tqdm import tqdm as tqdm_bar
-import streamlit as st
+import requests
 
-tgi_client = TGI(endpoint_name="huggingface-pytorch-tgi-inference-2024-07-31-08-41-02-341", region_name="us-east-1")
+# Initialize TGI client
+tgi_client = TGI(endpoint_name="huggingface-pytorch-tgi-inference-2024-08-01-16-41-32-607", region_name="us-east-1")
 
-def batch_generate(model, params, prompts, batch_size):
-    all_results = []
-    for i in tqdm_bar(range(0, len(prompts), batch_size), desc="Generating"):
-        batch_prompts = prompts[i: i + batch_size]
-        requests = [GenerateRequest(inputs=prompt, parameters=params) for prompt in batch_prompts]
-        batch_responses = model.create_from_objects(requests)
-        all_results.extend(batch_responses)
-    return all_results
+# Function to generate SQL from the prompt
+def generate_sql(tgi):
+    #prompt = f"Please translate the following query into SQL code: \n\n #Given query:# {query}\n\n #SQL code# \n\n"
+    prompt = f"""
+        You are a helpful assistant specializing in data analysis in a MySQL database. \n\n
+        Answer the question by providing SQL code compatible with the MySQL environment. \n\n
+        Question: \n\n 
+        Give me the number of orders that Aaron placed.
+        \n\n 
+        ### Database Schema \n
+        This query will run on a database whose schema is represented as follows: \n\n 
+        {{
+            "platform": {{
+                "orders": {{
+                    "orderID": "INTEGER",
+                    "userName": "VARCHAR(50)",
+                    "orderType": "VARCHAR(255)",
+                    "purchaseDate": "DATE"
+                }},
+                "products": {{
+                    "productID": "INTEGER",
+                    "productType": "VARCHAR(50)",
+                    "operatingSystem": "VARCHAR(50)"
+                }}
+            }}
+        }}
+        \n\n 
+        ### SQL \n
+        Given the database schema, here is the SQL query that answers the question:\n\n
+        
+        """
+
+
+    params = GenerateParameters(max_new_tokens=512, temperature=0.2, stop=["#SQL code#", "\n\n", "\"\"\""])
+    request = GenerateRequest(inputs=prompt, parameters=params)
+        
+    response = tgi.create_from_objects([request])[0]
+    return response
+
+# Function to extract SQL code from response
+def extract_sql(response):
+    marker = "answers the question:"
+    marker_index = response.find(marker)
+    if marker_index != -1:
+        sql_code = response[marker_index + len(marker):].strip()
+        return sql_code
+    return None
+
+# Function to send SQL code to Flask API
+def send_to_flask_api(sql_code):
+    api_url = "http://127.0.0.1:5000/receive-sql"  # Replace with your Flask API URL
+    payload = {"sql_code": sql_code}
+    try:
+        response = requests.post(api_url, json=payload)
+        response.raise_for_status()  # Raise an error for bad status codes
+        print("Response from Flask API:", response.json())
+    except requests.exceptions.RequestException as e:
+        print(f"Failed to send SQL code to Flask API. Error: {e}")
+
+# Generate SQL code using LLM
+response = generate_sql(tgi_client)
+print("Full response:", response)
+
+# Extract SQL code
+sql_code = extract_sql(response)
+if sql_code:
+    print("Extracted SQL code:", sql_code)
+    # Send extracted SQL code to Flask API
+    send_to_flask_api(sql_code)
+else:
+    print("No SQL code found in the response.")
+
+
+
+""" 
 
 
 # Load the database schema from JSON file
@@ -41,17 +104,17 @@ def schema_to_string(schema_dict):
 
 # Improved prompt with placeholders
 prompt_template = """
-You are a helpful assistant specializing in data analysis in a {db_format} warehouse.
-Answer the question by providing SQL code compatible with the {db_format} environment.
-Question: {query}
+#You are a helpful assistant specializing in data analysis in a {db_format} warehouse.
+#Answer the question by providing SQL code compatible with the {db_format} environment.
+#Question: {query}
 
 ### Database Schema
-This query will run on a database whose schema is represented as follows:
-{schema}
+#This query will run on a database whose schema is represented as follows:
+##{schema}
 
 ### SQL
-Given the database schema, here is the SQL query that answers the question:
-```sql
+#Given the database schema, here is the SQL query that answers the question:
+#```sql
 """
 
 # Function to generate and display the response
@@ -80,3 +143,4 @@ def generate_and_display_response():
 # Create a button to generate the SQL query
 if st.button("Generate"):
     generate_and_display_response()
+ """
