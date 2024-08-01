@@ -18,7 +18,8 @@ for further improvements or research directions.
 
 A small draft of the proposed architecture can be found in the 'images/Graph.png'.
 
-Challenges : 
+## Challenges 
+
 - First of all, the Llama3 70B model as it is is a big LLM, very hard to deploy at the Edge. 
 Two approaches can be explored from there.
 A Cloud solution to host it (on a AWS endpoint for example) seemed to be the fastest, most practical solution especially for a production environment.
@@ -27,7 +28,11 @@ Alternative models can be chosen to run locally, like the latests Llama3.1 8B.
 Also, the Llama3 70B model being outdated, the new 3.1 70B can be used here.
 
 - Another challenge was to find the right prompt to call the model. The prompt had to be designed in such way that the models would understand perfectly the query: this involed telling the model about the chosen database's architecture (Schema, Tables, etc), giving it an elaborate context window. Techniques to find the appropriate prompts have been investigated intensively the past few years. Also, I got inspired here by multiple sources.
+Evol-Instruct is a technique used to synthetically generate data. It involves prompting the generator model to create, from a high-quality seed dataset, a new instruction. Those pro
 
+## To go further
+
+Additional blocks can be added to this first draft in order to further improve this pipeline. 
 
 
 ## How to use
