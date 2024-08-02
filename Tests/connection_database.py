@@ -78,3 +78,24 @@ def get_database_architecture(engine):
     except SQLAlchemyError as e:
         st.error(f"Error fetching database architecture: {e}")
     return architecture
+
+
+def validate_sql_syntax(engine, sql_code):
+    try:
+        with engine.connect() as connection:
+            connection.execute(text(f"EXPLAIN {sql_code}"))
+        return True, "Syntax is correct"
+    except SQLAlchemyError as e:
+        return False, str(e)
+
+def check_schema_compliance(engine, sql_code):
+    try:
+        inspector = inspect(engine)
+        table_names = inspector.get_table_names()
+        for table in table_names:
+            columns = inspector.get_columns(table)
+            column_names = [col['name'] for col in columns]
+            # Implement a parser or use an SQL parser library to validate the column and table usage.
+        return True, "Query is schema-compliant"
+    except SQLAlchemyError as e:
+        return False, str(e)

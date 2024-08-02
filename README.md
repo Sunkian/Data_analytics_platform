@@ -18,6 +18,14 @@ for further improvements or research directions.
 
 A small draft of the proposed architecture can be found in the 'images/Graph.png'.
 
+Evalution : 
+In order to evaluate if the generated SQL code is valid, there are multiple methods that can be used :
+- Basic synthax validation
+- Semantic validation
+- Schema compliance
+- Unit tests with CodeT (https://github.com/microsoft/CodeT/tree/main/CodeT)
+- Human-in-the-loop
+
 ## Challenges 
 
 - First of all, the Llama3 70B model as it is is a big LLM, very hard to deploy at the Edge. 

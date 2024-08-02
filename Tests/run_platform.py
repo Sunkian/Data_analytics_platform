@@ -1,7 +1,7 @@
 # app.py
 import streamlit as st
 import pandas as pd
-from connection_database import connect_to_mysql, execute_sql_query, get_database_architecture
+from connection_database import connect_to_mysql, execute_sql_query, get_database_architecture, validate_sql_syntax, check_schema_compliance
 from run_Llama3 import generate_sql, extract_sql, send_to_flask_api
 import json
 from TextGenerationInference import TGI
@@ -102,24 +102,3 @@ if engine:
             st.error(f"Error: {e}")
 
     
-
-    # TEST THE DATABASE WITH AN SQL QUERY #
-    """ st.markdown('''
-    :orange[Test : write an SQL query to send the database]
-    ''')
-    # Input for the SQL query
-    sql_query = st.text_area("Enter your SQL query:")
-    
-    # Button to execute the SQL query
-    if st.button("Execute"):
-        if sql_query.strip():
-            # Execute the SQL query
-            query_results = execute_sql_query(engine, sql_query)
-            
-            if query_results:
-                # Display the results as a DataFrame
-                df = pd.DataFrame(query_results)
-                st.write("Query Results:")
-                st.dataframe(df)
-        else:
-            st.error("Please enter a SQL query before executing.") """

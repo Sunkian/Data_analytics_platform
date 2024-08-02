@@ -1,5 +1,20 @@
 {
     "platform": {
+        "city": {
+            "cityID": "INTEGER",
+            "cityName": "VARCHAR(50)",
+            "cityPopulation": "INTEGER"
+        },
+        "country": {
+            "country_id": "INTEGER",
+            "country_name": "VARCHAR(255)"
+        },
+        "location": {
+            "locationID": "INTEGER",
+            "locationName": "VARCHAR(50)",
+            "locationType": "VARCHAR(50)",
+            "locationAddress": "VARCHAR(50)"
+        },
         "orders": {
             "orderID": "INTEGER",
             "userName": "VARCHAR(50)",
