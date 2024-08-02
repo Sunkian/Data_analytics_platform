@@ -5,13 +5,64 @@ import requests
 tgi_client = TGI(endpoint_name="huggingface-pytorch-tgi-inference-2024-08-01-16-41-32-607", region_name="us-east-1")
 
 # Function to generate SQL from the prompt
-def generate_sql(tgi):
+def generate_sql(tgi, type, query, schema):
+    #prompt = f"Please translate the following query into SQL code: \n\n #Given query:# {query}\n\n #SQL code# \n\n"
+    prompt = f"""
+        You are a helpful assistant specializing in data analysis in a {type} database. \n\n
+        Answer the question by providing SQL code compatible with the {type} environment. \n\n
+        Question: \n\n 
+        {query}
+        \n\n 
+        ### Database Schema \n
+        This query will run on a database whose schema is represented as follows: \n\n 
+        {schema}
+        \n\n 
+        ### SQL \n
+        Given the database schema, here is the SQL query that answers the question:\n\n
+        
+        """
+
+
+    params = GenerateParameters(max_new_tokens=512, temperature=0.2, stop=["#SQL code#", "\n\n", "\"\"\""])
+    request = GenerateRequest(inputs=prompt, parameters=params)
+        
+    response = tgi.create_from_objects([request])[0]
+    return response
+
+# Function to extract SQL code from response
+def extract_sql(response):
+    marker = "answers the question:"
+    marker_index = response.find(marker)
+    if marker_index != -1:
+        # Extract everything after the marker, keeping all formatting
+        sql_code = response[marker_index + len(marker):]
+        return sql_code
+    return None
+
+
+# Function to send SQL code to Flask API
+def send_to_flask_api(sql_code):
+    api_url = "http://127.0.0.1:5000/receive-sql"  # Replace with your Flask API URL
+    payload = {"sql_code": sql_code}
+    try:
+        response = requests.post(api_url, json=payload)
+        response.raise_for_status()  # Raise an error for bad status codes
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        print(f"Failed to send SQL code to Flask API. Error: {e}")
+        return None
+
+
+
+# ===== Test =====
+
+def generate_sql_test(tgi):
     #prompt = f"Please translate the following query into SQL code: \n\n #Given query:# {query}\n\n #SQL code# \n\n"
     prompt = f"""
         You are a helpful assistant specializing in data analysis in a MySQL database. \n\n
         Answer the question by providing SQL code compatible with the MySQL environment. \n\n
         Question: \n\n 
-        Give me the number of orders that Aaron placed.
+        Give me the number of laptops that Aaron placed.
         \n\n 
         ### Database Schema \n
         This query will run on a database whose schema is represented as follows: \n\n 
@@ -36,35 +87,15 @@ def generate_sql(tgi):
         
         """
 
-
     params = GenerateParameters(max_new_tokens=512, temperature=0.2, stop=["#SQL code#", "\n\n", "\"\"\""])
     request = GenerateRequest(inputs=prompt, parameters=params)
         
     response = tgi.create_from_objects([request])[0]
     return response
 
-# Function to extract SQL code from response
-def extract_sql(response):
-    marker = "answers the question:"
-    marker_index = response.find(marker)
-    if marker_index != -1:
-        sql_code = response[marker_index + len(marker):].strip()
-        return sql_code
-    return None
 
-# Function to send SQL code to Flask API
-def send_to_flask_api(sql_code):
-    api_url = "http://127.0.0.1:5000/receive-sql"  # Replace with your Flask API URL
-    payload = {"sql_code": sql_code}
-    try:
-        response = requests.post(api_url, json=payload)
-        response.raise_for_status()  # Raise an error for bad status codes
-        print("Response from Flask API:", response.json())
-    except requests.exceptions.RequestException as e:
-        print(f"Failed to send SQL code to Flask API. Error: {e}")
-
-# Generate SQL code using LLM
-response = generate_sql(tgi_client)
+""" # Generate SQL code using LLM
+response = generate_sql_test(tgi_client)
 print("Full response:", response)
 
 # Extract SQL code
@@ -74,14 +105,11 @@ if sql_code:
     # Send extracted SQL code to Flask API
     send_to_flask_api(sql_code)
 else:
-    print("No SQL code found in the response.")
+    print("No SQL code found in the response.") """
 
 
 
-""" 
-
-
-# Load the database schema from JSON file
+""" # Load the database schema from JSON file
 def load_schema():
     try:
         with open("platform_architecture.json", "r") as f:

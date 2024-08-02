@@ -1,6 +1,10 @@
 from flask import Flask, request, jsonify
+from connection_database import connect_to_mysql, execute_sql_query
 
 app = Flask(__name__)
+
+# Connect to the database
+engine = connect_to_mysql()
 
 @app.route('/receive-message', methods=['POST'])
 def receive_message():
@@ -21,8 +25,20 @@ def receive_sql():
     data = request.get_json()
     sql_code = data.get('sql_code', '')
     print("Received SQL code:", sql_code)
-    # Do something with the SQL code, like executing it or storing it
-    return jsonify({"status": "success", "message": "SQL code received"}), 200
+    
+    if not sql_code.strip():
+        return jsonify({"error": "No SQL code provided"}), 400
+
+    # Execute the SQL code and fetch results
+    if engine:
+        try:
+            query_results = execute_sql_query(engine, sql_code)
+            return jsonify({"status": "success", "results": query_results}), 200
+        except Exception as e:
+            return jsonify({"status": "error", "message": str(e)}), 500
+    else:
+        return jsonify({"status": "error", "message": "Database connection failed"}), 500
+    
 
 
 if __name__ == '__main__':
