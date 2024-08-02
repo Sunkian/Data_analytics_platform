@@ -16,7 +16,7 @@ for further improvements or research directions.
 
 ## Approach
 
-A small draft of the proposed architecture can be found in the 'images/Graph.png'.
+A first draft of the proposed software architecture can be found in the 'images/Graph.png'.
 
 Evalution : 
 In order to evaluate if the generated SQL code is valid, there are multiple methods that can be used :
@@ -64,7 +64,10 @@ python3.11 -m pip install --upgrade pip
 pip3 install -r requirements.txt
 ```
 
-4. Make sure your database is active
+4. Make sure that :
+- You database is active
+- Your AWS endpoint is active
+- You are in the 'Tests' directory
 
 5. Run the Flask API
 ```sh
@@ -73,6 +76,13 @@ run flask_api.py
 
 6. Run the Streamlit app
 ```sh
-streamlit run streamlit_platform.py
+streamlit run run_platform.py
 ```
+
+7. You can test the following commands: 
+- Give me the number of laptops that Aaron placed.
+- I want to search for all the order types linked to the Aaron
+- Insert a new table called ‘city’ in my database.
+- Insert new data in the ‘city’ table
+- Give me the content from the ‘city’ table in my database
 
