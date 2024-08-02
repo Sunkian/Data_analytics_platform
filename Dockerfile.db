@@ -1,0 +1,8 @@
+# Use official MySQL image from Docker Hub
+FROM mysql:8.0
+
+# Set the root password for MySQL (you should use an environment variable in production)
+ENV MYSQL_ROOT_PASSWORD=my-secret-pw
+
+# Create a database
+ENV MYSQL_DATABASE=platform
